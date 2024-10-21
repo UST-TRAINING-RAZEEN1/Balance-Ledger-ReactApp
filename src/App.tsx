@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
-import Ledger from './component/Ledger';
+import React, { useState, useEffect } from 'react';
+import Ledger from './component/Ledger'; // Adjust the import according to your file structure
+
+interface Transaction {
+  type: string;
+  amount: number;
+  date: string; // Include date in the Transaction interface
+}
 
 const App: React.FC = () => {
-  const [transactions, setTransactions] = useState<{ type: string; amount: number }[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const addTransaction = (type: string, amount: number) => {
-    const newTransaction = { type, amount };
-    setTransactions([...transactions, newTransaction]);
+    const newTransaction: Transaction = {
+      type,
+      amount,
+      date: new Date().toLocaleString(), // Capture the current date
+    };
+    setTransactions(prev => [...prev, newTransaction]);
   };
+
+  
 
   return (
     <div>
@@ -18,4 +30,7 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+
+
 

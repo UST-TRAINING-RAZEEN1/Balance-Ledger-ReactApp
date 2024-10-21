@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import './Ledger.css';
 
-
 interface Transaction {
   type: string;
   amount: number;
+  date: string; // Add date to the transaction
 }
 
 interface LedgerProps {
@@ -13,24 +13,25 @@ interface LedgerProps {
 }
 
 const Ledger: React.FC<LedgerProps> = ({ transactions, addTransaction }) => {
-  const [debitAmount, setDebitAmount] = useState<string>('');
-  const [creditAmount, setCreditAmount] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
+  const [transactionType, setTransactionType] = useState<string>('debit');
   const totalDebitedRef = useRef<number>(0);
   const totalCreditedRef = useRef<number>(0);
 
-  const handleDebit = () => {
-    if (debitAmount) {
-      addTransaction('debit', Number(debitAmount));
-      totalDebitedRef.current += Number(debitAmount);
-      setDebitAmount(''); // Clear controlled input
-    }
-  };
+  const handleTransaction = () => {
+    if (amount) {
+      const amountNumber = Number(amount);
+      const type = transactionType;
+      const currentDate = new Date().toLocaleString(); // Get current date and time
+      addTransaction(type, amountNumber);
 
-  const handleCredit = () => {
-    if (creditAmount) {
-      addTransaction('credit', Number(creditAmount));
-      totalCreditedRef.current += Number(creditAmount);
-      setCreditAmount(''); // Clear controlled input
+      if (type === 'debit') {
+        totalDebitedRef.current += amountNumber;
+      } else {
+        totalCreditedRef.current += amountNumber;
+      }
+
+      setAmount(''); // Clear controlled input
     }
   };
 
@@ -42,33 +43,42 @@ const Ledger: React.FC<LedgerProps> = ({ transactions, addTransaction }) => {
       <div>
         <input
           type="number"
-          value={debitAmount}
-          onChange={e => setDebitAmount(e.target.value)}
-          placeholder="Debit Amount"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          placeholder="Amount"
         />
-        <button onClick={handleDebit}>Debit</button>
+        <select value={transactionType} onChange={e => setTransactionType(e.target.value)}>
+          <option value="debit">Debit</option>
+          <option value="credit">Credit</option>
+        </select>
+        <button onClick={handleTransaction}>Add Transaction</button>
       </div>
-      <div>
-        <input
-          type="number"
-          value={creditAmount}
-          onChange={e => setCreditAmount(e.target.value)}
-          placeholder="Credit Amount"
-        />
-        <button onClick={handleCredit}>Credit</button>
-      </div>
+
       <h3>Total Debited: {totalDebitedRef.current}</h3>
       <h3>Total Credited: {totalCreditedRef.current}</h3>
       <h3>Balance: {balance}</h3>
 
       <h2>Transaction History</h2>
-      <ul>
-        {transactions.map((transaction, index) => (
-          <li key={index}>
-            {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}: ${transaction.amount.toFixed(2)}
-          </li>
-        ))}
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Debit</th>
+            <th>Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((transaction, index) => (
+            <tr key={index}>
+              <td>{transaction.date}</td>
+              <td>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</td>
+              <td>{transaction.type === 'debit' ? `RS.${transaction.amount.toFixed(2)}` : '-'}</td>
+              <td>{transaction.type === 'credit' ? `RS.${transaction.amount.toFixed(2)}` : '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
