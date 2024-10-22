@@ -4,17 +4,21 @@ import Ledger from './component/Ledger'; // Adjust the import according to your 
 interface Transaction {
   type: string;
   amount: number;
-  date: string; // Include date in the Transaction interface
+  purpose: string;
+  date: string;
+   // Include date in the Transaction interface
 }
 
 const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const addTransaction = (type: string, amount: number) => {
+  const addTransaction = (type: string, amount: number,purpose:string) => {
     const newTransaction: Transaction = {
       type,
       amount,
-      date: new Date().toLocaleString(), // Capture the current date
+      purpose ,
+      date: new Date().toLocaleString(),
+      
     };
     setTransactions(prev => [...prev, newTransaction]);
   };
